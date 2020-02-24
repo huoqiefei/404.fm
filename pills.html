@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pills </title>
+   <style>
+
+   </style>
+
+</head>
+<body>
+
+    <div id="app"> <!--作用范围 #app -->
+        
+
+         
+ 
+    <ul v-show="tag == ''">
+        <li v-for="pill in pills">
+          
+            <span>{{pill.datetime}}</span>
+            
+            <p id="content-div"> {{ pill.content }}</p>
+
+        </li>
+    </ul>
+
+    <ul v-show = "tag != ''">
+<p>{{tag}}</p>
+    </ul>
+
+    </div>
+ 
+
+
+
+
+    <!-------- axios 请求-------->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-------- Vue 组件-------->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script type="text/javascript" src="../../hashtag/hashtag-js/hashtag.js"></script>
+    <script>
+  
+
+
+        var app = new Vue({
+
+            el: '#app',
+
+            data: {
+               
+                pills:{},
+                tag:'',
+            },
+
+            created(){
+                //自动加载get方法
+                this.get();
+            },
+
+            methods:{
+                get:function(){
+                    var outter = this;
+                    axios.get("http://dushu.io/api/pills").then(
+                        function(response){
+                             outter.pills = response.data;
+                             outter.$nextTick(() =>{
+                             outter.hashtag('#content-div');
+                             if(outter.getQueryVariable('tag')){
+                                outter.tag = decodeURI((outter.getQueryVariable('tag')));
+                             }
+                            
+                            });
+
+                        }),function(err){
+                            console.log(err);
+                        }
+                },
+
+                hashtag:function(div){
+                    Hashtag.setOptions({
+                        templates: {
+                            'timecho': '<a href="?tag={#n}">{#}</a>',
+                        }
+                    });
+ 
+                    content = Hashtag.replaceTags(div,'timecho');
+                },
+
+                getPillsByTag:function(str){
+                   alert(str);
+                },
+
+                getQueryVariable:function(variable){
+                    var query = window.location.search.substring(1);
+                    var vars = query.split("&");
+                    for (var i=0;i<vars.length;i++) {
+                        var pair = vars[i].split("=");
+                        if(pair[0] == variable){return pair[1];}
+                    }
+                    return(false);
+                }
+
+ 
+               
+            }
+
+        })
+
+       
+
+    </script>
+
+
+
+</body>
+</html>
